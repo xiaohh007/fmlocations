@@ -61,6 +61,7 @@ def five_minutes():
         fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
         print(result_lng)
         print(result_lat)
+        print(frequency)
         print(type(result_lng))
         print(type(result_lat))
         print(type(frequency))
@@ -71,14 +72,14 @@ def five_minutes():
 
                 if out in codingfrequencylist:
                     fmcoding = fmcoding+"_001"
-                    with DB(host='47.92.93.8',user='root',passwd='1qazxsw2',db='fm_db') as db:
-                        db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','old','{}')"
+                    with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
+                        db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','old')"
                                    .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list))
                 else:
                     fmcoding = fmcoding+"_000"
-                    with DB(host='47.92.93.8',user='root',passwd='1qazxsw2',db='fm_db') as db:
-                        db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','new','{}')"
-                           .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list))
+                    with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
+                        db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','new')"
+                                   .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list))
 
             else:
                 print("数据计算有误,不保存数据")
