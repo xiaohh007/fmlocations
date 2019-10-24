@@ -192,12 +192,12 @@ def one_day():
 
                 if out in codingfrequencylist:
                     fmcoding = fmcoding+"_001"
-                    with DB(host='47.92.93.8',user='root',passwd='1qazxsw2',db='fm_db') as db:
+                    with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
                         db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',1440,'{}','{}','{}','{}','{}','old','{}')"
                                    .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
                 else:
                     fmcoding = fmcoding+"_000"
-                    with DB(host='47.92.93.8',user='root',passwd='1qazxsw2',db='fm_db') as db:
+                    with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
                         db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',1440,'{}','{}','{}','{}','{}','new','{}')"
                                    .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
 
