@@ -79,7 +79,7 @@ def five_minutes():
 
                                 else:
                                     with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                                        db.execute("UPDATE fm_location SET lng = '{}' , lat = '{}', positioning_level ='{}' WHERE fmcoding = '{}' and positioning_level > '{}'"
+                                        db.execute("UPDATE fm_t_fmlocation SET lng = '{}' , lat = '{}', positioning_level ='{}' WHERE fmcoding = '{}' and positioning_level > '{}'"
                                                    .format(result_lng,result_lat,radio_fmcoding,result_accuratetype,result_accuratetype))
 
                             else:
