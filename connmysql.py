@@ -31,10 +31,12 @@ def get_fmdata(fm, starttime, endtime):
     # LEFT JOIN fm_t_whitelist c ON a.frequency = c.frequency 
     # LEFT JOIN fm_t_address d ON c.area = d.name where a.frequency ='''+ fm +''' AND DATE_FORMAT(a.upload_time,'%Y-%c-%d %H:%i:%S') BETWEEN \''''+ starttime + '''\' AND \''''+ endtime+ '''\' ORDER BY a.frequency'''
 
+
     sql = '''SELECT a.id, b.device_lgid,a.frequency,a.lon,a.lat,a.signal_strength,c.area,d.lon,d.lat,DATE_FORMAT(a.upload_time,'%Y-%c-%d %H:%i:%S') AS upload_time FROM fm_t_scan_record a
     LEFT JOIN fm_t_task_record b ON a.task_record_id = b.id 
     LEFT JOIN fm_t_whitelist c ON a.frequency = c.frequency 
     LEFT JOIN fm_t_address d ON c.area = d.name where a.frequency ='''+ fm +''' AND DATE_FORMAT(a.upload_time,'%Y-%c-%d %H:%i:%S') BETWEEN \''''+ starttime + '''\' AND \''''+ endtime+ '''\' ORDER BY a.frequency'''
+
 
     try:
         cursor.execute(sql)
