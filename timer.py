@@ -60,57 +60,63 @@ def five_minutes():
 
                 if out in codingfrequencylist:
 
-                    if len(radiolist) > 0 and radiolist[2] is not None :
 
-                            radio_lng = radiolist[3]
-                            radio_lat = radiolist[4]
-                            radio_createtime = radiolist[1]
-                            radio_fmcoding = radiolist[2]
-                            radio_bantime = radiolist[5]
-                            coding = int(radio_fmcoding[-1])
-                            distance_fm = error_range(radio_lng,radio_lat,result_lng,result_lat)
-                            if radio_bantime is None:
-                                if distance_fm > 20000:
-                                    fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
-                                    fmcoding = fmcoding+'_'+str(coding + 1)
-                                    with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                                        db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','new','{}')"
-                                                   .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
-
-                                else:
-                                    with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                                        db.execute("UPDATE fm_t_fmlocation SET lng = '{}' , lat = '{}', positioning_level ='{}' WHERE fmcoding = '{}' and positioning_level > '{}'"
-                                                   .format(result_lng,result_lat,radio_fmcoding,result_accuratetype,result_accuratetype))
-
-                            else:
-                                fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
-                                fmcoding = fmcoding+'_'+str(coding + 1)
-                                with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                                    db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','new','{}')"
-                                               .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
-                    else:
-
-                        locationvaluelists = query_fmlocation(out)
-
-                        locations_lng = locationvaluelists[2]
-                        locations_lat = locationvaluelists[3]
-                        locations_fmcoding = locationvaluelists[1]
-                        coding = int(locations_fmcoding[-1])
-                        distance_fm = error_range(locations_lng,locations_lat,result_lng,result_lat)
-                        if distance_fm > 20000:
-                            fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
-                            fmcoding = fmcoding+'_'+str(coding + 1)
-                            with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                                db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','new','{}')"
-                                           .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
-                        else:
-                            print("该频率信息已存在!")
+                    with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
+                        db.execute("UPDATE fm_t_fmlocation SET lng = '{}' , lat = '{}' WHERE frequency = '{}' "
+                                   .format(result_lng,result_lat,result_frequency))
+                        print("该频率已存在,更新数据!")
+                    # if len(radiolist) > 0 and radiolist[2] is not None :
+                    #
+                    #         radio_lng = radiolist[3]
+                    #         radio_lat = radiolist[4]
+                    #         radio_createtime = radiolist[1]
+                    #         radio_fmcoding = radiolist[2]
+                    #         radio_bantime = radiolist[5]
+                    #         coding = int(radio_fmcoding[-1])
+                    #         distance_fm = error_range(radio_lng,radio_lat,result_lng,result_lat)
+                    #         if radio_bantime is None:
+                    #             if distance_fm > 20000:
+                    #                 fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
+                    #                 fmcoding = fmcoding+'_'+str(coding + 1)
+                    #                 with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
+                    #                     db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','new','{}')"
+                    #                                .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
+                    #
+                    #             else:
+                    #                 fmcoding = str(result_frequency+"_"+str(radio_createtime).replace('-','').replace(':','').replace(' ',''))
+                    #                 with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
+                    #                     db.execute("UPDATE fm_t_fmlocation SET lng = '{}' , lat = '{}',fmcoding = '{}', positioning_level ='{}' WHERE fmcoding = '{}' and positioning_level > '{}'"
+                    #                                .format(result_lng,result_lat,radio_fmcoding,result_accuratetype,radio_fmcoding,result_accuratetype))
+                    #
+                    #         else:
+                    #             fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
+                    #             fmcoding = fmcoding+'_'+str(coding + 1)
+                    #             with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
+                    #                 db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','new','{}')"
+                    #                            .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
+                    # else:
+                    #
+                    #     locationvaluelists = query_fmlocation(out)
+                    #
+                    #     locations_lng = locationvaluelists[2]
+                    #     locations_lat = locationvaluelists[3]
+                    #     locations_fmcoding = locationvaluelists[1]
+                    #     coding = int(locations_fmcoding[-1])
+                    #     distance_fm = error_range(locations_lng,locations_lat,result_lng,result_lat)
+                    #     if distance_fm > 20000:
+                    #         fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
+                    #         fmcoding = fmcoding+'_'+str(coding + 1)
+                    #         with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
+                    #             db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','new','{}')"
+                    #                        .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
+                    #     else:
+                    #         print("该频率信息已存在!")
 
                 else:
                     fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
                     fmcoding = fmcoding+'_'+str(serialnumber)
                     with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                        db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,status,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','new','{}')"
+                        db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','{}')"
                            .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
 
             else:
@@ -160,7 +166,7 @@ if __name__ == '__main__':
 
 
     # schedule.every(5).seconds.do(job1)
-    schedule.every(30).seconds.do(five_minutes)
+    schedule.every(300).seconds.do(five_minutes)
     # schedule.every(50).seconds.do(thirty_minutes)
     # schedule.every(500).seconds.do(one_day)
 
