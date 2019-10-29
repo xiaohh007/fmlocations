@@ -5,7 +5,7 @@ from numba import none
 from MysqlHelp import DB
 
 
-out = '107.2'
+out = '102.5'
 with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
     db.execute("select frequency,create_time,fmcoding,lng ,lat,ban_time FROM fm_t_radiolist WHERE frequency='{}'".format(out))
     radiolist = db.fetchall()

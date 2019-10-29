@@ -6,7 +6,7 @@ import KalmanFilter
 
 
 
-def get_rssidata_c(result, dbmin=-95, dbmax=-30):
+def get_rssidata_c(result, dbmin=-95, dbmax=-20):
 
     indexs = []
     for index, row in result.iterrows():

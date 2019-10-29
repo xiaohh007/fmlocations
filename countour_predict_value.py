@@ -11,17 +11,15 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 from mpl_toolkits.mplot3d  import Axes3D
 import scipy.signal as signal
-import countor_predvex
-import circlejudge as cj
+import countor_predvex_opt as cpo
 import getlinloc
 
 def pred_location(fm, starttime, endtime):
     
     try:
         result = connmysql.get_fmdata(fm, starttime , endtime)
-        
         data_clean, deviceids = rssiclean.get_rssidata_c(result)
-        xy_vex = countor_predvex.get_predvex(starttime , endtime)
+        xy_vex = cpo.get_predvex(starttime , endtime)
         x = []
         y = []
         z = []
@@ -34,11 +32,18 @@ def pred_location(fm, starttime, endtime):
         typenum = 0
 
 
-
+        
         for data in data_clean:
-            wgsloc = projtrans.bd09_to_wgs84(float(data['lon']), float(data['lat']))       
-            utmloc = projtrans.wgs2utm(wgsloc[0], wgsloc[1])
-            data['lon'],data['lat'] = utmloc[0], utmloc[1]
+            # print(data['lon'])
+            if data['lon'] is not None and float(data['lon'])>100:
+                wgsloc = projtrans.bd09_to_wgs84(float(data['lon']), float(data['lat']))       
+                utmloc = projtrans.wgs2utm(wgsloc[0], wgsloc[1])
+                data['lon'],data['lat'] = utmloc[0], utmloc[1]
+                x.append(utmloc[0]/1000)
+                y.append(utmloc[1]/1000)
+                z.append(data['db'])
+                # print("1")
+                # print(data)
             try:
                 if float(data['fmlon'])>100:
                     wgsloc_0 = projtrans.bd09_to_wgs84(float(data['fmlon']), float(data['fmlat']))
@@ -46,9 +51,7 @@ def pred_location(fm, starttime, endtime):
                     data['fmlon'],data['fmlat'] = utmloc_0[0], utmloc_0[1]
             except:
                 pass
-            x.append(utmloc[0]/1000)
-            y.append(utmloc[1]/1000)
-            z.append(data['db'])
+            
         # print(utmloc_0)
         # print(z)
         # print(x)
@@ -75,7 +78,7 @@ def pred_location(fm, starttime, endtime):
         elif len(z) == 2:
             locpx, locpy = getlinloc.get2point(points,z)
             typenum = 4
-            print(locpx, locpy)
+            # print(locpx, locpy)
             # if len(utmloc_0)>0:
             #     print(utmloc_0)
             #     print('距离差', math.sqrt((locpy*1000-utmloc_0[1])**2+(locpx*1000-utmloc_0[0])**2))
@@ -147,15 +150,17 @@ def pred_location(fm, starttime, endtime):
                     elif zi[locy][locx]<zi[locy][locx-1]:
                         locx -= 1 
                     else:
-                        # print(locx, locy)
+                        # mx, my = min(x)+locx*xinternal, min(y)+locy*yinternal
+                        # print(min(x), min(y))
                         # print(zi[locy][locx])
-                        if abs(zi[locy][locx] - max(z))<5 or zi[locy][locx] > max(z):
-                            locpreds.append([min(x)+locx*xinternal, min(y)+locy*yinternal])
+                        if locx>50 and locy>50 and locx<len(xxi)-50 and locy<len(yyi)-50:
+                            if abs(zi[locy][locx] - max(z))<5 or zi[locy][locx] > max(z):
+                                locpreds.append([min(x)+locx*xinternal, min(y)+locy*yinternal])
                         break       
                 pi += 1
 
 
-            if len(locpreds)>0 and len(z)>6:
+            if len(locpreds)>0: #and len(z)>=6
                 locpred = np.array(list(set([tuple(t) for t in locpreds])))
                 locpx =0
                 locpy =0
@@ -180,6 +185,7 @@ def pred_location(fm, starttime, endtime):
                     locpx = locpx / len(locpreds)
                     locpy = locpy / len(locpreds)
                 # print("0",locpx, locpy)
+                # print(xy_vex)
                 locpx -= xy_vex[0]
                 locpy -= xy_vex[1]
                 typenum = 1
@@ -203,18 +209,19 @@ def pred_location(fm, starttime, endtime):
                 # print(points[zmaxindex][0], points[zmaxindex][1])
                 locpx = (points[zmaxindex][0] + pnearx)/2
                 locpy = (points[zmaxindex][1] + pneary)/2
+                typenum = 2
                 # print(locpx, locpy)
                 # if len(utmloc_0)>0:
                 #     print('距离差', math.sqrt((locpy*1000-utmloc_0[1])**2+(locpx*1000-utmloc_0[0])**2))
-                typenum = 2
-                if max(z)>-45 and max(z)<-40:
-                    # print(max(z))
-                    zindex = z.index(max(z))
-                    locpx, locpy = x[zindex], y[zindex]
-                    typenum = 2
-                    # print(locpx,locpy)
-                    # if len(utmloc_0)>0:
-                    #     print('距离差', math.sqrt((y[zindex]*1000-utmloc_0[1])**2+(x[zindex]*1000-utmloc_0[0])**2))
+                
+                # if max(z)>-45 :#and max(z)<-40
+                #     # print(max(z))
+                #     zindex = z.index(max(z))
+                #     locpx, locpy = x[zindex], y[zindex]
+                #     typenum = 2
+                #     print(locpx,locpy)
+                #     if len(utmloc_0)>0:
+                #         print('距离差', math.sqrt((y[zindex]*1000-utmloc_0[1])**2+(x[zindex]*1000-utmloc_0[0])**2))
                 # else:
                 #     # print(max(z))
                 #     zindex = z.index(max(z))
@@ -227,24 +234,24 @@ def pred_location(fm, starttime, endtime):
             # yy = np.float(lineparam[0])*(xx-np.float(lineparam[1]))+ np.float(lineparam[2])
             # plt.plot(xx, yy, color='red')
             
-            # plt.contourf(xi,yi,zi,8,alpha=1,cmap=plt.cm.hsv)#画上颜色
-            # c = plt.contour(xi,yi,zi,[0,10]) #等高线绘制
-            # plt.plot(px,py,'ro')
+            plt.contourf(xi,yi,zi,8,alpha=1,cmap=plt.cm.hsv)#画上颜色
+            c = plt.contour(xi,yi,zi,[0,10]) #等高线绘制
+            plt.plot(px,py,'ro')
 
-            # plt.plot(utmloc_0[0]/1000,utmloc_0[1]/1000,'yo')
-            # # 线条标注的绘制
-            # plt.clabel(c,inline=True,fontsize=10)
-            # # plt.show()
-            
-            # fig = plt.figure()
-            # ax = plt.axes(projection='3d')
-            # ax.contour3D(xi, yi, zi, 50, cmap='CMRmap')
-            # ax.set_xlabel('x')
-            # ax.set_ylabel('y')
-            # ax.set_zlabel('z')
-            # #调整观察角度和方位角。这里将俯仰角设为60度，把方位角调整为35度
-            # ax.view_init(60, 35)
+            plt.plot(utmloc_0[0]/1000,utmloc_0[1]/1000,'yo')
+            # 线条标注的绘制
+            plt.clabel(c,inline=True,fontsize=10)
             # plt.show()
+            
+            fig = plt.figure()
+            ax = plt.axes(projection='3d')
+            ax.contour3D(xi, yi, zi, 50, cmap='CMRmap')
+            ax.set_xlabel('x')
+            ax.set_ylabel('y')
+            ax.set_zlabel('z')
+            #调整观察角度和方位角。这里将俯仰角设为60度，把方位角调整为35度
+            ax.view_init(60, 35)
+            plt.show()
 
         # plt.plot(px,py,'ro')
         # plt.plot(utmloc_0[0]/1000,utmloc_0[1]/1000,'yo')

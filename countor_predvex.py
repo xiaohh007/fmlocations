@@ -13,30 +13,34 @@ from scipy.interpolate import griddata
 # import scipy.signal as signal
 
 def get_predvex(starttime, endtime):
-    fmdatas = ['87.9', '93.4', '91.4', '89.9', '107.7']
+    fmdatas = ['93.4','94','99']  #['87.9', '93.4', '91.4', '89.9', '107.7']
     x_vex = 0
     y_vex = 0
     lenfm = 0
     for fmdata in fmdatas:
         try:
             result = connmysql.get_fmdata(fmdata, starttime, endtime)
+            
             data_clean, deviceids = rssiclean.get_rssidata_c(result,dbmax=-40, dbmin=-95)
+            
             x = []
             y = []
             z = []
             utmloc_0 =[]
             for data in data_clean:
-                wgsloc = projtrans.bd09_to_wgs84(float(data['lon']), float(data['lat']))
-                utmloc = projtrans.wgs2utm(wgsloc[0], wgsloc[1])
-                data['lon'],data['lat'] = utmloc[0], utmloc[1]
-
-                wgsloc_0 = projtrans.bd09_to_wgs84(float(data['fmlon']), float(data['fmlat']))            
-                utmloc_0 = projtrans.wgs2utm(wgsloc_0[0], wgsloc_0[1])           
-                data['fmlon'],data['fmlat'] = utmloc_0[0], utmloc_0[1]
-                x.append(utmloc[0]/1000)
-                y.append(utmloc[1]/1000)
-                z.append(data['db'])
-
+                if data['lon'] is not None and float(data['lon'])>100:
+                    wgsloc = projtrans.bd09_to_wgs84(float(data['lon']), float(data['lat']))
+                    utmloc = projtrans.wgs2utm(wgsloc[0], wgsloc[1])
+                    data['lon'],data['lat'] = utmloc[0], utmloc[1]
+                    x.append(utmloc[0]/1000)
+                    y.append(utmloc[1]/1000)
+                    z.append(data['db'])
+                if data['fmlon'] is not None and float(data['fmlon'])>100:
+                    wgsloc_0 = projtrans.bd09_to_wgs84(float(data['fmlon']), float(data['fmlat']))            
+                    utmloc_0 = projtrans.wgs2utm(wgsloc_0[0], wgsloc_0[1])           
+                    data['fmlon'],data['fmlat'] = utmloc_0[0], utmloc_0[1]
+                
+            
             points=[]
             px = []
             py = []
@@ -118,19 +122,21 @@ def get_predvex(starttime, endtime):
             if len(locpreds)>0:
                 locpx = locpx / len(locpreds)
                 locpy = locpy / len(locpreds)
-                # print(locpx, locpy)
+                
                 # print(math.sqrt((locpy*1000-utmloc_0[1])**2+(locpx*1000-utmloc_0[0])**2))
-            # print("1",x_vex,y_vex,locpx - utmloc_0[0]/1000,(locpy - utmloc_0[1]/1000))
-            x_vex += (locpx - utmloc_0[0]/1000)
-            y_vex += (locpy - utmloc_0[1]/1000)
-            lenfm += 1
+            print("1",x_vex,y_vex,locpx - utmloc_0[0]/1000,(locpy - utmloc_0[1]/1000))
+            if locpx > 300:
+                x_vex += (locpx - utmloc_0[0]/1000)
+                y_vex += (locpy - utmloc_0[1]/1000)
+                lenfm += 1
         except:
             pass
     #     print("+",x_vex,y_vex)
-    # print("vex:" ,x_vex, y_vex)
+    print("vex:" ,x_vex, y_vex, lenfm)
     if lenfm > 0:
         x_vex = x_vex / lenfm
         y_vex = y_vex / lenfm
+    print("vex", x_vex,y_vex)
     return [x_vex, y_vex]
 
         # locpx=0
