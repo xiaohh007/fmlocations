@@ -59,7 +59,7 @@ def five_minutes():
 
         # 查询radiolist表中各频率的详细的数据
         radiolists = query_radiolist(out)
-        print("radiolists++++++++++++++",radiolists)
+
 
         print(result_accuratetype)
         result_facility_list = ",".join(result[3])
