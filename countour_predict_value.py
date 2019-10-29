@@ -234,24 +234,24 @@ def pred_location(fm, starttime, endtime):
             # yy = np.float(lineparam[0])*(xx-np.float(lineparam[1]))+ np.float(lineparam[2])
             # plt.plot(xx, yy, color='red')
             
-            plt.contourf(xi,yi,zi,8,alpha=1,cmap=plt.cm.hsv)#画上颜色
-            c = plt.contour(xi,yi,zi,[0,10]) #等高线绘制
-            plt.plot(px,py,'ro')
-
-            plt.plot(utmloc_0[0]/1000,utmloc_0[1]/1000,'yo')
-            # 线条标注的绘制
-            plt.clabel(c,inline=True,fontsize=10)
+            # plt.contourf(xi,yi,zi,8,alpha=1,cmap=plt.cm.hsv)#画上颜色
+            # c = plt.contour(xi,yi,zi,[0,10]) #等高线绘制
+            # plt.plot(px,py,'ro')
+            #
+            # plt.plot(utmloc_0[0]/1000,utmloc_0[1]/1000,'yo')
+            # # 线条标注的绘制
+            # plt.clabel(c,inline=True,fontsize=10)
+            # # plt.show()
+            #
+            # fig = plt.figure()
+            # ax = plt.axes(projection='3d')
+            # ax.contour3D(xi, yi, zi, 50, cmap='CMRmap')
+            # ax.set_xlabel('x')
+            # ax.set_ylabel('y')
+            # ax.set_zlabel('z')
+            # #调整观察角度和方位角。这里将俯仰角设为60度，把方位角调整为35度
+            # ax.view_init(60, 35)
             # plt.show()
-            
-            fig = plt.figure()
-            ax = plt.axes(projection='3d')
-            ax.contour3D(xi, yi, zi, 50, cmap='CMRmap')
-            ax.set_xlabel('x')
-            ax.set_ylabel('y')
-            ax.set_zlabel('z')
-            #调整观察角度和方位角。这里将俯仰角设为60度，把方位角调整为35度
-            ax.view_init(60, 35)
-            plt.show()
 
         # plt.plot(px,py,'ro')
         # plt.plot(utmloc_0[0]/1000,utmloc_0[1]/1000,'yo')
