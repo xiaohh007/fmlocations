@@ -11,15 +11,18 @@ from MysqlHelp import DB
 
 
 
-global endtime
-global comparelist
-global coding
-global radiovaluelists
+
+
+
+
+
+
 radiovaluelists = []
-comparelist = []
-
-
 def five_minutes():
+    global endtime
+    global coding
+
+    comparelist = []
     endtime = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     starttime = (datetime.datetime.now()+datetime.timedelta(hours= -3)).strftime("%Y-%m-%d %H:%M:%S")
     print(starttime)
@@ -75,11 +78,11 @@ def five_minutes():
                 # 判断该频率是存在于fmlocation表中
                 if out in codingfrequencylist:
                     # 判断radiolist表中是否存在该频率并且未被取缔
-                    print("len(radiolists)++++++++++++++",len(radiolists))
+
                     if len(radiolists) > 0:
                         for radiolist in radiolists:
                             # 存在该频率且未被取缔,将定位算法的数据与本表中的数据一一对比
-                            print("radiolist+++++++++++++++++++++++",radiolist)
+
                             radio_lng = radiolist[3]
                             radio_lat = radiolist[4]
 
@@ -135,14 +138,14 @@ def five_minutes():
 
 def query_radiolist(out):
     global radiovaluelist
-    print('query_radiolist++++++++++++++++',out)
+
     radiovaluelist = []
     with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
         db.execute("select frequency,create_time,fmcoding,lng ,lat,ban_time FROM fm_t_radiolist WHERE frequency='{}' and ban_time is NULL order by id desc".format(float(out)))
         radiolist = db.fetchall()
 
     for radio in radiolist:
-        print(radio)
+
         radiovaluelist = list(radio.values())
 
         radiovaluelists.append(radiovaluelist)
