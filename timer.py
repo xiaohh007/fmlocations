@@ -259,7 +259,7 @@ if __name__ == '__main__':
 
 
     # schedule.every(5).seconds.do(job1)
-    schedule.every(10).seconds.do(five_minutes)
+    schedule.every(300).seconds.do(five_minutes)
     # schedule.every(50).seconds.do(thirty_minutes)
     # schedule.every(500).seconds.do(one_day)
 
