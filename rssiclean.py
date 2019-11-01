@@ -64,7 +64,7 @@ def get_rssidata_c(result, dbmin=-95, dbmax=-20):
             for data in result_deviceid['db'].values.tolist():
                 data_gauss.append(float(data))
                 
-            if max(data_gauss)-min(data_gauss)<=6:
+            if max(data_gauss)-min(data_gauss)<=15:
                 usigma = GaussFB.Gaussfb(data_gauss)
                 data_clbyr = []
                 for key, row in result_deviceid.iterrows():

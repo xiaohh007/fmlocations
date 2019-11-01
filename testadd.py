@@ -4,7 +4,7 @@ from numba import none
 
 from MysqlHelp import DB
 
-
+if __name__ == '__main__':
 # out = '89.5'
 # global radiovaluelist
 #
@@ -21,11 +21,15 @@ from MysqlHelp import DB
 #
 #
 # print(locationvaluelists)
-# #
-from geopy.distance import geodesic
+    import countour_predict_value as cpv
+    from geopy.distance import geodesic
 
-print(geodesic((31.522861960848147,121.28995214107017), (31.50011971568552,121.28409854909114)).m) #计算两个坐标直线距离
-print(geodesic((31.30169546322556,121.38089409658731), (30.96444862415061,121.15025151332885)).km) #计算两个坐标直线距离
+
+
+    result = cpv.pred_location('90.9', '2019-10-31 00:00:00', '2019-11-01 16:36:00')
+
+    print(geodesic((result[2], result[1]), (31.244937,121.506373)).m) #计算两个坐标直线距离
+    print(geodesic((31.30169546322556,121.38089409658731), (30.96444862415061,121.15025151332885)).km) #计算两个坐标直线距离
 
 
 # coding = 'asdfl;lk;kk'
