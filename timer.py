@@ -102,7 +102,7 @@ def five_minutes():
                             distance_fm = error_range(radio_lng,radio_lat,result_lng,result_lat)
 
 
-                            if distance_fm <20000:
+                            if distance_fm <30000:
                                 # 定义数组compare,存放比较的范围状态,在范围内记为A,在范围外记为B,添加到数组中
 
                                 comparelist.append({'A':radio_fmcoding})
@@ -152,7 +152,7 @@ def five_minutes():
                             location_lat = fmlocation[3]
                             distance_location = error_range(location_lng,location_lat,result_lng,result_lat)
 
-                            if distance_location <20000:
+                            if distance_location <30000:
                                 # 定义数组compare,存放比较的范围状态,在范围内记为A,在范围外记为B,添加到数组中
 
                                 comparelocationlist.append({'A':location_coding})
