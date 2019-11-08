@@ -5,6 +5,8 @@ import schedule
 from geopy.distance import geodesic
 from numba import none
 from numpy import double
+from pandas._libs import json
+from pkg_resources.extern.six.moves import urllib
 
 import countour_predict_value as cpv
 from MysqlHelp import DB
@@ -61,6 +63,9 @@ def five_minutes():
         result_lng = result[1]
         result_lat = result[2]
         result_accuratetype = str(result[4])
+
+        result_addr = list(jsonFormat(str(result_lat),str(result_lng)))
+        address = ''.join(result_addr)
 
         # 查询radiolist表中各频率的详细的数据
         radiolists = query_radiolist(out)
@@ -126,15 +131,15 @@ def five_minutes():
                                 compare_coding = str(compare_code).replace('[','').replace(']','').replace('\'','')
                                 print(compare_coding)
                                 with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                                    db.execute("update fm_t_fmlocation set time='{}',lng='{}',lat='{}',equipmentschedule='{}',positioning_level='{}' where fmcoding = '{}' AND positioning_level < '{}'"
-                                                .format(endtime,result_lng,result_lat,result_facility_list,result_accuratetype,compare_coding,result_accuratetype))
+                                    db.execute("update fm_t_fmlocation set time='{}',lng='{}',lat='{}',equipmentschedule='{}',positioning_level='{}' ,address = '{}' where fmcoding = '{}' AND positioning_level < '{}'"
+                                                .format(endtime,result_lng,result_lat,result_facility_list,result_accuratetype,address,compare_coding,result_accuratetype))
                                 continue
                         else:
                             fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
                             fmcoding = fmcoding+'_'+str(coding + 1)
                             with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                                db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','{}')"
-                                    .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
+                                db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,positioning_level,address) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','{}','{}')"
+                                    .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype,address))
 
 
 
@@ -191,14 +196,14 @@ def five_minutes():
                             fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
                             fmcoding = fmcoding+'_'+str(codings+1)
                             with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                                db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','{}')"
-                                           .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
+                                db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,positioning_level,address) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','{}','{}')"
+                                           .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype,address))
                 else:
                     fmcoding = str(result_frequency+"_"+str(endtime).replace('-','').replace(':','').replace(' ',''))
                     fmcoding = fmcoding+'_'+str(serialnumber)
                     with DB(host='47.92.33.19',user='root',passwd='1qazxsw2',db='database_fm') as db:
-                        db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,positioning_level) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','{}')"
-                            .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype))
+                        db.execute("INSERT into fm_t_fmlocation (id,time,size,frequency,lng,lat,fmcoding,equipmentschedule,positioning_level,address) VALUES(null,'{}',5,'{}','{}','{}','{}','{}','{}','{}')"
+                            .format(endtime,result_frequency,result_lng,result_lat,fmcoding,result_facility_list,result_accuratetype,address))
 
             else:
                 print("数据计算有误,不保存数据")
@@ -246,6 +251,42 @@ def query_fmlocationlist(out):
     locationvaluelist.clear()
     print()
     return locationvaluelists
+#基于百度地图API下的经纬度信息来解析地理位置信息
+def getlocation(lat,lng):
+    #31.809928, 102.537467, 3019.300
+    #lat = '31.809928'
+    #lng = '102.537467'
+    url = 'http://api.map.baidu.com/geocoder/v2/?location=' + lat + ',' + lng + '&output=json&pois=1&ak=003EurM0nat1YfowgMZPIBpDtGjbGOri'
+    req = urllib.request.urlopen(url)  # json格式的返回数据
+    res = req.read().decode("utf-8")  # 将其他编码的字符串解码成unicode
+    return json.loads(res)
+
+#json序列化解析数据(lat:纬度，lng:经度)
+def jsonFormat(lat,lng):
+    str = getlocation(lat,lng)
+    dictjson={}#声明一个字典
+    #get()获取json里面的数据
+    jsonResult = str.get('result')
+    address = jsonResult.get('addressComponent')
+    #国家
+    country = address.get('country')
+    #国家编号（0：中国）
+    country_code = address.get('country_code')
+    #省
+    province = address.get('province')
+    #城市
+    city = address.get('city')
+    #城市等级
+    city_level = address.get('city_level')
+    #县级
+    district = address.get('district')
+    #把获取到的值，添加到字典里（添加）
+    dictjson['country']=country
+
+    dictjson['city'] = city
+
+    dictjson['district']=district
+    return dictjson.values()
 
 
 def error_range(radio_lng,radio_lat,result_lng,result_lat):
